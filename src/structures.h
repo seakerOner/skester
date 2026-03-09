@@ -2,8 +2,8 @@
 #define TESTER_STRUCTURES_H
 
 #include "../external/mystrings.h"
-#include "./messages.h"
-#include "./string_allocator.h"
+#include "messages.h"
+#include "string_allocator.h"
 
 typedef enum {
     TESTER = 0,

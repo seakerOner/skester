@@ -17,8 +17,9 @@ BENCH(NULL, apple){
     SKS_UNUSED(a)
 }
 
-BENCH(NULL, apple){
+BENCH(XDD, apple){
     int a = 50 + 50;
     printf("FROM APPLE\n");
     SKS_UNUSED(a)
 }
+

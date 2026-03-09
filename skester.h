@@ -1,7 +1,6 @@
 #ifndef SKESTER_H
 #define SKESTER_H
 
-#include "backend/messages.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -80,7 +79,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         const skester_case_extern *c;
 
         for (c = &__start_skester_cases; c < &__stop_skester_cases; c++) {
-            printf("%s[Suite]%s: %s | %s[Name]%s: %s | %s[Type]%s: %s\n",
+            printf("%s[Suite]%s: %s | %s[Name]%s: %s | %s[Type]%s: %s | %s[PATH]%s%s:%zu\n",
                     SKS_SETGREENCOLOR,
                     SKS_RESETALLSTYLES,
                     c->suite,
@@ -89,7 +88,11 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
                     c->name,
                     SKS_SETGREENCOLOR,
                     SKS_RESETALLSTYLES,
-                    (c->type ? "BENCH" : "TEST"));
+                    (c->type ? "BENCH" : "TEST"),
+                    SKS_SETGREENCOLOR,
+                    SKS_RESETALLSTYLES,
+                    c->file,
+                    c->line);
         }
     }
 
@@ -128,6 +131,8 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
 
             SKS_MSG_OK("PASS\n");
         }
+
+        SKS_MSG_ERR("[ERROR] Case not found.\n Case name -> %s", filter);
     }
 
     __attribute__((weak))
