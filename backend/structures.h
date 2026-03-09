@@ -86,7 +86,7 @@ void sks_suitelist_addsuite(ascii* name, skester_suite* out_suite) {
     suite.suite_name = suite_name;
     suite.id         = sks_suite_space.sp;
     suite.cp         = 0;
-    suite.capacity = 12;
+    suite.capacity   = 12;
     suite.cases      = (skester_case *)malloc(sizeof(skester_case) * suite.capacity);
 
     sks_suite_space.suites[sks_suite_space.sp++] = suite;
@@ -128,15 +128,6 @@ skester_suite sks_ensure_suite(ascii* name) {
 }
 
 void sks_testcase_add(size_t testsuite_id, ascii* name) {
-  if (sks_string_space.bytes == NULL) {
-    int str_space_res = sks_s_allocator_init(32, &sks_string_space);
-    if (str_space_res == -1) {
-      SKS_MSG_ERR("[ERROR] Global string_space failed.\n");
-      SKS_MSG_ERR("[ERROR] Failed to add test case.\n[TEST] %s\n", (char *)name);
-      exit(EXIT_FAILURE);                
-    }
-  }
-
   sks_string name_string = {0};
   int add_str_res = sks_s_allocator_add(&sks_string_space, name, &name_string);
 

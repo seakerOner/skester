@@ -1,6 +1,7 @@
 #ifndef SKESTER_H
 #define SKESTER_H
 
+#include "backend/messages.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -70,7 +71,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
 
 #endif
 
-// #define SKESTER_IMPL
+ //#define SKESTER_IMPL
 #if defined (SKESTER_IMPL)
     extern const skester_case_extern __start_skester_cases;
     extern const skester_case_extern __stop_skester_cases;
@@ -125,7 +126,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
 
             t->fn();
 
-            printf("PASS\n");
+            SKS_MSG_OK("PASS\n");
         }
     }
 
