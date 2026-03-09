@@ -29,6 +29,11 @@ int sks_s_allocator_add(sks_string_allocator* allocator,
                         ascii* name, 
                         sks_string *string_out);
 
+int sks_s_allocator_addS(sks_string_allocator* allocator, 
+                        ascii* name, 
+                        size_t len,
+                        sks_string *string_out);
+
 void sks_s_allocator_destroy(sks_string_allocator allocator);
 
 #define SKS_S_ALLOCATOR_GET(allocator, string_id, out)                         \
@@ -47,7 +52,8 @@ do {                                                                           \
 // implementation
 
 // #define SKS_STRING_ALLOCATOR_IMPL
-#if (defined(SKS_STRING_ALLOCATOR_IMPL))
+#if (defined(SKS_STRING_ALLOCATOR_IMPL) && !defined(SKS_SL_IMPLEMENTED))
+#define SKS_SL_IMPLEMENTED
 
 int sks_s_allocator_init(int init_cap, sks_string_allocator* out) {
   sks_string_allocator s_alloc;

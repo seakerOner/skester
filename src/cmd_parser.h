@@ -74,7 +74,8 @@ void sks_free_pipe(skester_pipe pipe);
 #endif
 
 //#define CMD_PARSER_IMPL
-#if defined (CMD_PARSER_IMPL)
+#if defined (CMD_PARSER_IMPL) && !defined (CMD_PARSER_IMPLEMENTED)
+#define CMD_PARSER_IMPLEMENTED
 
 void sks_pipe_new_flag_segment(skester_pipe* pipe, 
                                int* cases_index, 
@@ -182,13 +183,10 @@ skester_pipe sks_parse_args(int argc, char** argv) {
 
         uint8_t last_flag = pipe.flags_order[idx_flag_order-1];
 
-        switch (last_flag) {
-            case _SUITE:
-                SKS_ADD_SUITE_OFFSET(pipe, idx_suite_offsets, x);
-                break;
-            default:
-                SKS_ADD_CASE_OFFSET(pipe, idx_case_offsets, x);
-                break;
+        if (last_flag == _SUITE) {
+            SKS_ADD_SUITE_OFFSET(pipe, idx_suite_offsets, x);
+        } else {
+            SKS_ADD_CASE_OFFSET(pipe, idx_case_offsets, x);
         }
     }
 
@@ -198,8 +196,9 @@ skester_pipe sks_parse_args(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    if (idx_flag_order < _SKS_MAX_FLAGS) 
+    if (idx_flag_order < _SKS_MAX_FLAGS) {
         ADD_FLAG_ORDER(pipe, idx_flag_order, 0);
+    }
 
     pipe.suite_max_offsets = idx_suite_offsets;
     pipe.case_max_offsets  = idx_case_offsets;
@@ -212,4 +211,5 @@ void sks_free_pipe(skester_pipe pipe) {
     pipe.case_max_offsets = 0;
     pipe.suite_max_offsets = 0;
 }
+
 #endif

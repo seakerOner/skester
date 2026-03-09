@@ -1,9 +1,9 @@
 #ifndef TESTER_STRUCTURES_H
 #define TESTER_STRUCTURES_H
 
+#include "string_allocator.h"
 #include "../external/mystrings.h"
 #include "messages.h"
-#include "string_allocator.h"
 
 typedef enum {
     TESTER = 0,
@@ -142,7 +142,53 @@ void sks_testcase_add(size_t testsuite_id, ascii* name) {
     .suite_id = testsuite_id,
   };
   (void)test;
+
   // add test to testsuite
+}
+
+void structure_dump(FILE* stream) {
+    char buffer[1024];
+
+    // case structure coming from process dump
+    // c->suite,
+    // c->name,
+    // c->file,
+    // c->line,
+    // c->type);
+
+    while (fgets(buffer, sizeof(buffer), stream) != NULL) {
+        int p = 0;
+        int last_tok = 0;
+        printf("buffer: %s ", buffer);
+
+    next_tok:
+        if (buffer[p] == '\n')
+            continue;
+
+        int start_tok = p;
+
+        while (buffer[p] != ' ') {
+            p++;
+        }
+
+        if (buffer[p] == '\0') {
+            last_tok = 1;
+        }
+        buffer[p] = '\0';
+
+        sks_string string;
+        sks_s_allocator_add(&sks_string_space, (ascii *)&buffer[start_tok], &string);
+
+        // TODO: ADD TOKENS TO STRUCTURES
+
+        if (last_tok) 
+            buffer[p] = '\n';
+
+        p++;
+
+        goto next_tok;
+
+    }
 }
 
 #endif

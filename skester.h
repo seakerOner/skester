@@ -100,7 +100,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         const skester_case_extern *c;
 
         for (c = &__start_skester_cases; c < &__stop_skester_cases; c++) {
-            printf("%s %s %s %zu %d ",
+            printf("%s %s %s %zu %d \n",
                     c->suite,
                     c->name,
                     c->file,
@@ -109,7 +109,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         }
     }
 
-    static void skester_run(int argc, char** argv) {
+    static void skester_run_case(int argc, char** argv) {
         int arg_p = 3;          
         const skester_case_extern* t;
 
@@ -140,7 +140,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         if (argc > 1 && strcmp(argv[1], "dump") == 0) {
             skester_dump();
         } else if (argc > 1 && strcmp(argv[1], "run") == 0) {
-            skester_run(argc, argv);
+            skester_run_case(argc, argv);
         } else if (argc > 1 && strcmp(argv[1], "listall") == 0) {
             skester_listall();
         }

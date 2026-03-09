@@ -141,7 +141,8 @@ int ascii_starts_with(const ascii *str, const ascii *prefix, const size_t __n);
 
 #endif // !MYSTRINGS_H
 
-#if (defined(MYSTRINGS_IMPLEMENTATION))
+#if (defined(MYSTRINGS_IMPLEMENTATION) && !defined(MYSTRING_IMPLEMENTED))
+#define MYSTRING_IMPLEMENTED
 #include <stdio.h>
 
 void ascii2bits(ascii c, uint8_t bits[8]) {
