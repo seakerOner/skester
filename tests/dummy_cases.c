@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include "./skester.h"
+#include "../skester.h"
 #define SKESTER_IMPL
 #include "./dummy_cases2.c"
 

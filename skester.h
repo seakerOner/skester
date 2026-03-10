@@ -14,6 +14,9 @@
 
 #define TEST(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, TESTER, __COUNTER__)   
 #define BENCH(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, BENCHER, __COUNTER__) 
+
+
+// implementation
     
 typedef enum {
     TESTER = 0,
@@ -130,6 +133,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
             t->fn();
 
             SKS_MSG_OK("PASS\n");
+            return;
         }
 
         SKS_MSG_ERR("[ERROR] Case not found.\n Case name -> %s", filter);

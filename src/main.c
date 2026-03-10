@@ -6,15 +6,15 @@
 #define SKS_UNUSED(var) (void)var;
 
 
-#include "./external/mystrings.h"
-#include "./src/string_allocator.h"
+#include "../external/mystrings.h"
+#include "string_allocator.h"
 #define SKS_STRING_ALLOCATOR_IMPL
 #define MYSTRINGS_IMPLEMENTATION
-#include "./src/structures.h"
-#include "./src/cmd_parser.h"
+#include "structures.h"
+#include "cmd_parser.h"
 #define CMD_PARSER_IMPL
-#include "./src/messages.h"
-#include "./src/pipe_exec.h"
+#include "messages.h"
+#include "pipe_exec.h"
 
 int main(int argc, char **argv) {
   skester_pipe pipe = sks_parse_args(argc, argv);

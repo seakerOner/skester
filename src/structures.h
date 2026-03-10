@@ -127,7 +127,7 @@ skester_suite sks_ensure_suite(ascii* name) {
     return suite;
 }
 
-void sks_testcase_add(size_t testsuite_id, ascii* name) {
+void sks_case_add(size_t testsuite_id, ascii* name, skester_case_type type) {
   sks_string name_string = {0};
   int add_str_res = sks_s_allocator_add(&sks_string_space, name, &name_string);
 
@@ -136,14 +136,26 @@ void sks_testcase_add(size_t testsuite_id, ascii* name) {
     exit(EXIT_FAILURE);                
   }
 
-  skester_case test = {
-    .name     = name_string,
-    .type     = TESTER,
-    .suite_id = testsuite_id,
-  };
-  (void)test;
+  skester_case test;
+  test.name = name_string;
+  test.type = type;
+  test.suite_id = testsuite_id;
 
-  // add test to testsuite
+  // add case to suite
+  
+  skester_suite* suite = &sks_suite_space.suites[test.suite_id];
+
+  if (suite->cp >= suite->capacity) {
+      suite->capacity *= 2;
+      void* res = realloc(suite->cases, sizeof(skester_case) * suite->capacity);
+      if (!res) {
+          SKS_MSG_ERR("[ERROR] Failed to allocate memory for suite cases\n");
+          exit(EXIT_FAILURE);
+      }
+      suite->cases = (skester_case *)res;
+  }
+
+  suite->cases[suite->cp++] = test;
 }
 
 void structure_dump(FILE* stream) {
@@ -157,9 +169,12 @@ void structure_dump(FILE* stream) {
     // c->type);
 
     while (fgets(buffer, sizeof(buffer), stream) != NULL) {
+        int pipe_idx = 0;
         int p = 0;
         int last_tok = 0;
-        printf("buffer: %s ", buffer);
+        int func_name_offset = 0;
+
+        skester_suite suite;
 
     next_tok:
         if (buffer[p] == '\n')
@@ -176,16 +191,38 @@ void structure_dump(FILE* stream) {
         }
         buffer[p] = '\0';
 
-        sks_string string;
-        sks_s_allocator_add(&sks_string_space, (ascii *)&buffer[start_tok], &string);
-
-        // TODO: ADD TOKENS TO STRUCTURES
+        switch (pipe_idx) {
+            case 0:     // suite
+                suite = sks_ensure_suite((ascii *)&buffer[start_tok]);
+                break;
+            case 1:     // func_name
+                func_name_offset = start_tok;
+                break;
+            case 2:     // file
+                // no used for now
+                break;
+            case 3:     // line
+                // no used for now
+                break;
+            case 4:     // type
+                if (buffer[start_tok] == '1') {             
+                    sks_case_add(suite.id, (ascii *)&buffer[func_name_offset], BENCHER);
+                } else if (buffer[start_tok] == '0') {  
+                    sks_case_add(suite.id, (ascii *)&buffer[func_name_offset], TESTER);
+                } else {
+                    SKS_MSG_ERR("[FATAL] UNKNOWN TYPE RECEIVED FROM EXECUTABLE WITH CASES");
+                    exit(EXIT_FAILURE);
+                }
+                break;
+            default:
+                break;
+        }
 
         if (last_tok) 
             buffer[p] = '\n';
 
         p++;
-
+        pipe_idx++;
         goto next_tok;
 
     }

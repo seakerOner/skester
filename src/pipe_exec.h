@@ -4,7 +4,7 @@
 #include "stdio.h"
 #include "string.h"
 #include <stdlib.h>
-#include <unistd.h>
+
 #include "messages.h"
 #include "cmd_parser.h"
 #include "structures.h"
@@ -25,7 +25,6 @@ void sks_process_pipe(skester_pipe* pipe) {
       fflush(stdout);
       dump = popen(buffer, "r");
 
-
       if (dump == NULL) {
           SKS_MSG_ERR("[ERROR] Failed to create new stream pipe to test subprocess");
           exit(EXIT_FAILURE);
@@ -35,17 +34,6 @@ void sks_process_pipe(skester_pipe* pipe) {
 
       pclose(dump);
   }
-
-
-  int exec_full_suite;
-
-  for (int x = 0; x < _SKS_MAX_FLAGS; x++) 
-      if (pipe->flags_order[x] == _SUITE)
-          exec_full_suite = 1;
-      else
-          exec_full_suite = 0;
-
-      
 
   for (int x = 0; x < _SKS_MAX_FLAGS; x++) {
     switch (pipe->flags_order[x]) {

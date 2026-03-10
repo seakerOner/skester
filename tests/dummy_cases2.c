@@ -1,4 +1,4 @@
-#include "./skester.h"
+#include "../skester.h"
 #include <stdio.h>
 
 TEST(unit_tests, fromotherfile) {

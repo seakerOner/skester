@@ -11,8 +11,8 @@ endif
 skester: main.o
 	$(CC) $(BUILD)/*.o -o $(BUILD)/skester
 
-main.o: main.c
-	$(CC) $(FLAGS) -c main.c -o $(BUILD)/main.o
+main.o: ./src/main.c
+	$(CC) $(FLAGS) -c ./src/main.c -o $(BUILD)/main.o
 
 clean:
 	rm -f $(BUILD)/*
@@ -28,6 +28,6 @@ debug:
 	@echo " "
 
 dummy:
-	gcc ./dummy_cases.c -o $(BUILD)/tests
+	gcc ./tests/dummy_cases.c -o $(BUILD)/tests
 	@echo "compiled tests!"
 
