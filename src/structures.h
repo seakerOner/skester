@@ -228,6 +228,42 @@ void structure_dump(FILE* stream) {
     }
 }
 
+skester_case* sks_find_case(skester_suite* suite, char* case_name) {
+    for (size_t x = 0; x < suite->cp; x++) {
+
+        ascii* _case_name;
+
+        SKS_S_ALLOCATOR_GET(
+                sks_string_space, 
+                suite->cases[x].name.id,
+                _case_name
+                );
+
+        if (strcmp((char *)_case_name, case_name) == 0)
+            return &suite->cases[x];
+    }
+
+    return NULL;
+}
+
+skester_suite* sks_find_suite(char* suite_name) {
+    for (size_t x = 0; x < sks_suite_space.sp; x++) {
+        skester_suite* suite = &sks_suite_space.suites[x];
+
+        ascii* _suite_name;
+        SKS_S_ALLOCATOR_GET(
+                sks_string_space, 
+                suite->suite_name.id, 
+                _suite_name
+        );
+
+        if (strcmp((char *)_suite_name, suite_name) != 0)
+            continue;
+    }
+
+    return NULL;
+}
+
 #endif
 
 #if defined (RUNNER_STRUCTURES_IMPL)

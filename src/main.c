@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);                
   }
 
-  sks_process_pipe(&pipe);
+  skester_query query = sks_process_pipe(&pipe);
 
   sks_free_pipe(pipe);
   sks_s_allocator_destroy(sks_string_space);

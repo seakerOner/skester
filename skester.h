@@ -128,11 +128,8 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
             if (filter && strcmp(t->name, filter) != 0)
                 continue;
 
-            printf("RUN %s/%s @ %s:%zu\n", t->suite, t->name, t->file, t->line);
-
             t->fn();
 
-            SKS_MSG_OK("PASS\n");
             return;
         }
 

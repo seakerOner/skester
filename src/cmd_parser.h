@@ -19,6 +19,7 @@ typedef enum {
 } skester_cmd_flags;
 
 typedef struct {
+    uint8_t activated_flags;
     int pathfile_offset;
     int8_t flags_order[_SKS_MAX_FLAGS];
     int* suite_names_offsets;
@@ -73,7 +74,7 @@ void sks_free_pipe(skester_pipe pipe);
 
 #endif
 
-//#define CMD_PARSER_IMPL
+#define CMD_PARSER_IMPL
 #if defined (CMD_PARSER_IMPL) && !defined (CMD_PARSER_IMPLEMENTED)
 #define CMD_PARSER_IMPLEMENTED
 
@@ -127,6 +128,7 @@ skester_pipe sks_parse_args(int argc, char** argv) {
             x++;
             pipe.pathfile_offset = x; 
             gotpath = 1;
+            pipe.activated_flags |= _PATHFILE;
 
             continue;
         }
@@ -136,6 +138,9 @@ skester_pipe sks_parse_args(int argc, char** argv) {
                 exit(EXIT_FAILURE);
             }
             sks_pipe_new_flag_segment(&pipe, &idx_case_offsets, &idx_suite_offsets, idx_flag_order);
+
+            pipe.activated_flags |= _TEST;
+            pipe.activated_flags |= _EXEC;
 
             ADD_FLAG_ORDER(pipe, idx_flag_order, _TEST);
 
@@ -148,6 +153,8 @@ skester_pipe sks_parse_args(int argc, char** argv) {
             }
             sks_pipe_new_flag_segment(&pipe, &idx_case_offsets, &idx_suite_offsets, idx_flag_order);
 
+            pipe.activated_flags |= _BENCH;
+            pipe.activated_flags |= _EXEC;
             ADD_FLAG_ORDER(pipe, idx_flag_order, _BENCH);
 
             continue;
@@ -159,6 +166,7 @@ skester_pipe sks_parse_args(int argc, char** argv) {
             }
             sks_pipe_new_flag_segment(&pipe, &idx_case_offsets, &idx_suite_offsets, idx_flag_order);
 
+            pipe.activated_flags |= _LIST;
             ADD_FLAG_ORDER(pipe, idx_flag_order, _LIST);
 
             continue;
@@ -170,6 +178,7 @@ skester_pipe sks_parse_args(int argc, char** argv) {
             }
             sks_pipe_new_flag_segment(&pipe, &idx_case_offsets, &idx_suite_offsets, idx_flag_order);
 
+            pipe.activated_flags |= _SUITE;
             ADD_FLAG_ORDER(pipe, idx_flag_order, _SUITE);
 
             continue;
