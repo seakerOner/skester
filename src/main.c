@@ -15,8 +15,11 @@
 #define CMD_PARSER_IMPL
 #include "messages.h"
 #include "pipe_exec.h"
+#include "query_exec.h"
 
 int main(int argc, char **argv) {
+  SKS_MSG_OK("[INFO] ");
+  printf("CREATING PIPE\n");
   skester_pipe pipe = sks_parse_args(argc, argv);
 
   sks_create_suitelist();
@@ -26,7 +29,18 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);                
   }
 
+  SKS_MSG_OK("[INFO] ");
+  printf("PROCESSING PIPE\n");
+
   skester_query query = sks_process_pipe(&pipe);
+
+  SKS_MSG_OK("[INFO] ");
+  printf("PROCESSING QUERY AND EXECUTING FLAGS\n");
+
+  sks_execute_query(&query);
+
+  SKS_MSG_OK("[INFO] ");
+  printf("SKESTER DONE :D\n");
 
   sks_free_pipe(pipe);
   sks_s_allocator_destroy(sks_string_space);

@@ -257,8 +257,8 @@ skester_suite* sks_find_suite(char* suite_name) {
                 _suite_name
         );
 
-        if (strcmp((char *)_suite_name, suite_name) != 0)
-            continue;
+        if (strcmp((char *)_suite_name, suite_name) == 0)
+            return suite;
     }
 
     return NULL;

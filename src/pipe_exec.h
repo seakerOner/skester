@@ -20,7 +20,7 @@ typedef struct {
 
 skester_query sks_process_pipe(skester_pipe* pipe) {
 
-  if (pipe->activated_flags & (_LIST | _EXEC)) {
+  if (pipe->activated_flags & _LIST && pipe->activated_flags & _EXEC) {
       SKS_MSG_ERR("[ERROR] You can't list and execute cases in the same skester pipe.\n");
       exit(EXIT_FAILURE);
   }
@@ -55,17 +55,10 @@ skester_query sks_process_pipe(skester_pipe* pipe) {
 
   query.bitflags = pipe->activated_flags;
 
-  int idx_cases  = 0;
   int idx_suites = 0;
 
   for (int x = 0; x < _SKS_MAX_FLAGS; x++) {
     switch (pipe->flags_order[x]) {
-      case _TEST:
-      case _BENCH:
-          while (idx_suites < pipe->suite_max_offsets 
-                    && pipe->suite_names_offsets[idx_suites] != -1) 
-              query.suite_count++;
-          break;
       case _LIST:
       case _SUITE:
           while (idx_suites < pipe->suite_max_offsets 
@@ -93,10 +86,10 @@ skester_query sks_process_pipe(skester_pipe* pipe) {
 end_suite_search:
   // list only works with suites, so no need to check cases
   if (pipe->activated_flags & _LIST)   
-      return query;
+       return query;
 
-  idx_cases  = 0;
-  idx_suites = 0;
+  int idx_cases  = 0;
+  int idx_fromsuites_toskip = 0;
 
   for (int x = 0; x < _SKS_MAX_FLAGS; x++) {
     switch (pipe->flags_order[x]) {
@@ -106,22 +99,22 @@ end_suite_search:
                     && pipe->case_names_offsets[idx_cases] != -1) {
               int off = pipe->case_names_offsets[idx_cases++];
 
-              for (size_t count = 0; count < query.suite_count; count++) {
+              for (int count = 0; count < query.suite_count; count++) {
 
                   skester_case* res = sks_find_case(query.suites[count], (char *)pipe->arguments_base[off]);
 
-                  if (res)
+                  if (res) {
                       query.cases[query.case_count++] = res;
+                  } else {
+                      SKS_MSG_ERR("[ERROR] Unknown case: %s \n", (char *)pipe->arguments_base[off]);
+                      exit(EXIT_FAILURE);
+                  }
               }
 
           }
           break;
       case _LIST:
       case _SUITE:
-          while (idx_suites < pipe->suite_max_offsets 
-                    && pipe->suite_names_offsets[idx_suites] != -1) 
-              query.suite_count++;
-          break;
       case 0:
           goto exit;
           break;

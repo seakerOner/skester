@@ -192,7 +192,7 @@ skester_pipe sks_parse_args(int argc, char** argv) {
 
         uint8_t last_flag = pipe.flags_order[idx_flag_order-1];
 
-        if (last_flag == _SUITE) {
+        if (last_flag == _SUITE || last_flag == _LIST) {
             SKS_ADD_SUITE_OFFSET(pipe, idx_suite_offsets, x);
         } else {
             SKS_ADD_CASE_OFFSET(pipe, idx_case_offsets, x);
