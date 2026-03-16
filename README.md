@@ -61,6 +61,7 @@ Example:
 
 ```c
 #include "skester.h"
+#define SKESTER_IMPL
 
 TEST(math, addition) {
     int result = 2 + 2;
@@ -83,7 +84,7 @@ SKester provides a minimal set of assertion macros.
 
 ```
 SKS_ASSERT(expression)
-SKS_ASSERT_MSG(expression, message)
+SKS_ASSERT_MSG(expression, message...)
 SKS_EQ(a, b)
 SKS_NE(a, b)
 ```
