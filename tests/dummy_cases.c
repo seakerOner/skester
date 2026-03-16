@@ -3,23 +3,32 @@
 
 #include "../skester.h"
 #define SKESTER_IMPL
+
 #include "./dummy_cases2.c"
 
 TEST(NULL, banana){
-    int a = 10 + 20;
-    printf("FROM BANANA\n");
-    SKS_UNUSED(a)
+    printf("BANANA WILL FAIL\n");
+    int* lel = NULL;
+    *lel = 20;
 }
 
-BENCH(NULL, apple){
-    int a = 50 + 50;
-    printf("FROM APPLE\n");
-    SKS_UNUSED(a)
+TEST(NULL, orange){
+    SKS_EQ(10, 10);
+    SKS_ASSERT_MSG(10 == 5, "Orange %s\n", "Failed");
+    SKS_NE(10, 10);
 }
 
-BENCH(XDD, apple){
-    int a = 50 + 50;
-    printf("FROM APPLE\n");
-    SKS_UNUSED(a)
+TEST(NULL, apple){
+    int p = 5;
+    SKS_ASSERT(10 > p);
 }
+
+
+
+
+// BENCH(XDD, apple){
+//     int a = 50 + 50;
+//     printf("FROM APPLE\n");
+//     SKS_UNUSED(a)
+// }
 

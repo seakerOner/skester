@@ -7,15 +7,61 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define _SKS_MAX_FLAGS 8        // 4 flags because EXEC is an internal flag
+#define _SKS_MAX_FLAGS 8        
+
+void sks_print_help(void) {
+    printf("\n");
+    printf("SKester - Lightweight C test runner\n\n");
+
+    printf("USAGE:\n");
+    printf("  skester -f <test_binary> [COMMANDS]\n\n");
+
+    printf("FLAGS:\n");
+    printf("  -f <file>        Path to executable containing tests\n");
+    printf("  -s <suite...>    Select suites\n\n");
+
+    printf("COMMANDS:\n");
+    printf("  test    <cases...>  Run test cases\n");
+    printf("  list    <suites...> List test cases from suites\n");
+    printf("  listall <noargs>    List all suites\n\n");
+
+    printf("NOTES:\n");
+    printf("  • Multiple suites can be specified\n");
+    printf("  • Cases run inside the selected suites\n");
+    printf("  • 'list' cannot be combined with execution commands\n");
+    printf("  • 'listall' must be a unique flag in a command\n\n");
+
+    printf("EXAMPLES:\n\n");
+
+    printf("  Run all tests in suites:\n");
+    printf("    skester -f ./tests test -s math utils \n\n");
+
+    printf("  Run specific test cases:\n");
+    printf("    skester -f ./tests -s math test add subtract\n\n");
+
+    printf("  Run a test case in all suites:\n");
+    printf("    skester -f ./tests test add \n\n");
+
+    printf("  List all tests in suites:\n");
+    printf("    skester -f ./tests list math utils\n\n");
+    printf("    skester -f ./tests list -s math utils\n\n");
+
+    printf("  List all suites:\n");
+    printf("    skester -f ./tests listall\n\n");
+
+    printf("  Run everything in a suite:\n");
+    printf("    skester -f ./tests test -s math\n\n");
+
+}
 
 typedef enum {
-    _PATHFILE  = 1 << 0,        // must always be set as first flag
-    _TEST      = 1 << 1,        // 0 -> NO TEST  | 1 -> TEST
-    _BENCH     = 1 << 2,        // 0 -> NO BENCH | 1 -> BENCH
-    _EXEC      = 1 << 3,        // 0 -> NO CASE EXEC | 1 -> CASE EXEC
-    _LIST      = 1 << 4,        // 0 -> NOLIST | 1 -> LIST
-    _SUITE     = 1 << 5,        // 0 -> NO SUITE | -> SUITE
+    _PATHFILE  = 1 << 0,        
+    _TEST      = 1 << 1,        
+    _BENCH     = 1 << 2,        
+    _EXEC      = 1 << 3,        
+    _LIST      = 1 << 4,        
+    _SUITE     = 1 << 5,        
+    _LISTALL   = 1 << 6,
 } skester_cmd_flags;
 
 typedef struct {
@@ -74,7 +120,7 @@ void sks_free_pipe(skester_pipe pipe);
 
 #endif
 
-#define CMD_PARSER_IMPL
+// #define CMD_PARSER_IMPL
 #if defined (CMD_PARSER_IMPL) && !defined (CMD_PARSER_IMPLEMENTED)
 #define CMD_PARSER_IMPLEMENTED
 
@@ -118,6 +164,7 @@ skester_pipe sks_parse_args(int argc, char** argv) {
     int idx_suite_offsets = 0;
 
     int8_t gotpath = 0;
+    int8_t noargflag = 0;
     for (int x = 1; x < argc; x++) {
         if (strcmp(argv[x], "-f") == 0) {
             if (x == argc - 1) {
@@ -131,6 +178,14 @@ skester_pipe sks_parse_args(int argc, char** argv) {
             pipe.activated_flags |= _PATHFILE;
 
             continue;
+        }
+        if (strcmp(argv[x], "--help") == 0 || strcmp(argv[x], "-h") == 0 ) {
+            sks_print_help();
+            noargflag = 1;
+        }
+        if (strcmp(argv[x], "listall") == 0) {
+            pipe.activated_flags |= _LISTALL;
+            noargflag = 1;
         }
         if (strcmp(argv[x], "test") == 0) {
             if (x == argc - 1) {
@@ -185,9 +240,11 @@ skester_pipe sks_parse_args(int argc, char** argv) {
         }
 
         // if not a flag its an argument, type of argument depends on the last flag added
-        if (idx_flag_order == 0) { 
+        if (idx_flag_order == 0 && noargflag == 0) { 
             SKS_MSG_ERR("[ERROR] No type of flag set before arguments.\n Maybe you called a flag without an argument? \n");
             exit(EXIT_FAILURE);
+        } else if (noargflag == 1) {
+            noargflag = 0;
         }
 
         uint8_t last_flag = pipe.flags_order[idx_flag_order-1];

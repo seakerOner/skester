@@ -11,6 +11,7 @@
 
 typedef struct { 
     uint8_t bitflags;
+    char* pathfile;
 
     int case_count;
     int suite_count;
@@ -53,6 +54,8 @@ skester_query sks_process_pipe(skester_pipe* pipe) {
 
   skester_query query = {0};
 
+  query.pathfile = source_path;
+
   query.bitflags = pipe->activated_flags;
 
   int idx_suites = 0;
@@ -89,7 +92,6 @@ end_suite_search:
        return query;
 
   int idx_cases  = 0;
-  int idx_fromsuites_toskip = 0;
 
   for (int x = 0; x < _SKS_MAX_FLAGS; x++) {
     switch (pipe->flags_order[x]) {

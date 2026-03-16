@@ -1,6 +1,60 @@
 #ifndef SKESTER_H
 #define SKESTER_H
 
+// API
+
+// test function
+#define TEST(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, TESTER, __COUNTER__)   
+
+// for unused variables
+#define SKS_UNUSED(var) (void)var;
+
+// assert expressions
+#define SKS_ASSERT(expression)                                \
+    do {                                                      \
+    if (!(expression)) {                                      \
+        SKS_MSG_ERR("Expression failed: %s\n", #expression);  \
+        SKS_MSG_ERR("Location: %s:%d\n", __FILE__, __LINE__); \
+        exit(EXIT_FAILURE);                                   \
+    }                                                         \
+    } while (0)
+
+// assert expressions with a message
+#define SKS_ASSERT_MSG(expression, msg...)                    \
+    do {                                                      \
+    if (!(expression)) {                                      \
+        SKS_MSG_ERR(msg);                                     \
+        SKS_MSG_ERR("Location: %s:%d\n", __FILE__, __LINE__); \
+        exit(EXIT_FAILURE);                                   \
+    }                                                         \
+    } while (0)
+
+// equal 2 variables or immediate values
+#define SKS_EQ(x, p)                                          \
+    do {                                                      \
+    if (x != p) {                                             \
+        SKS_MSG_ERR("Not equal: %s != %s\n", #x, #p);         \
+        SKS_MSG_ERR("Location: %s:%d\n", __FILE__, __LINE__); \
+        exit(EXIT_FAILURE);                                   \
+    }                                                         \
+    } while (0)
+
+// not equal 2 variables or immediate values
+#define SKS_NE(x, p)                                          \
+    do {                                                      \
+    if (x == p) {                                             \
+        SKS_MSG_ERR("It's equal: %s != %s\n", #x, #p);        \
+        SKS_MSG_ERR("Location: %s:%d\n", __FILE__, __LINE__); \
+        exit(EXIT_FAILURE);                                   \
+    }                                                         \
+    } while (0)
+
+// not implemented
+
+// #define BENCH(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, BENCHER, __COUNTER__) 
+
+// implementation
+
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -8,15 +62,6 @@
 
 #define SKS_CAT(a, b) SKS_CAT_EXPAND (a, b)
 #define SKS_CAT_EXPAND(a, b) a##b
-
-// API
-#define SKS_UNUSED(var) (void)var;
-
-#define TEST(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, TESTER, __COUNTER__)   
-#define BENCH(suite, func_name) SKS_EXPAND_CASE(#suite, func_name, BENCHER, __COUNTER__) 
-
-
-// implementation
     
 typedef enum {
     TESTER = 0,
@@ -112,28 +157,48 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         }
     }
 
-    static void skester_run_case(int argc, char** argv) {
-        int arg_p = 3;          
+    // skester run [case]
+    // skester run [suite] [case]
+    static void skester_run(int argc, char** argv) {
         const skester_case_extern* t;
+        if (argc == 3) {
 
-        if (arg_p > argc) {
+            const char* filter = argv[argc - 1];
+
+            for (t = &__start_skester_cases; t < &__stop_skester_cases; t++) {
+
+                if (filter && strcmp(t->name, filter) != 0)
+                    continue;
+
+                t->fn();
+
+                return;
+            }
+
+            SKS_MSG_ERR("[ERROR] Case not found.\n Case name -> %s", filter);
+        } else if (argc == 4) {
+
+            const char* suite_name = argv[argc - 2];
+            const char* case_name  = argv[argc - 1];
+
+            for (t = &__start_skester_cases; t < &__stop_skester_cases; t++) {
+
+                if ((case_name && suite_name) 
+                        && strcmp(t->suite, suite_name) != 0
+                        && strcmp(t->name, case_name) != 0)
+                    continue;
+
+                t->fn();
+
+                return;
+            }
+
+            SKS_MSG_ERR("[ERROR] Case not found.\n Case name -> %s", case_name);
+
+        } else if (argc < 3) {
             SKS_MSG_ERR("[ERROR] 'run' expects case name as argument.\n");
             exit(EXIT_FAILURE);
         }
-
-        const char* filter = argv[arg_p - 1];
-
-        for (t = &__start_skester_cases; t < &__stop_skester_cases; t++) {
-
-            if (filter && strcmp(t->name, filter) != 0)
-                continue;
-
-            t->fn();
-
-            return;
-        }
-
-        SKS_MSG_ERR("[ERROR] Case not found.\n Case name -> %s", filter);
     }
 
     __attribute__((weak))
@@ -141,7 +206,7 @@ static void SKS_CAT(SKS_CAT(func_name, unique_id),_impl)(void);         \
         if (argc > 1 && strcmp(argv[1], "dump") == 0) {
             skester_dump();
         } else if (argc > 1 && strcmp(argv[1], "run") == 0) {
-            skester_run_case(argc, argv);
+            skester_run(argc, argv);
         } else if (argc > 1 && strcmp(argv[1], "listall") == 0) {
             skester_listall();
         }
